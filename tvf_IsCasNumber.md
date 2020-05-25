@@ -1,4 +1,4 @@
-''' sql
+``` sql
 create function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
 returns table
 /**************************************
@@ -51,4 +51,4 @@ return	with cte12Rows(rowNumber) as
 			) as cdp  -- CAS digit position
 			where	cdp.digit is not null
 		) as cas;
-'''
+```
