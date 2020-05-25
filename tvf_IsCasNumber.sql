@@ -1,4 +1,4 @@
-alter function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
+create function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
 returns table
 /**************************************
 *	Use set-based logic to validate a Chemical Abstracts Service (CAS) Number
@@ -11,7 +11,7 @@ returns table
 *	The check digit is found by taking the last digit times 1, the preceding digit times 2, the preceding digit times 3 etc., 
 *	adding all these up and computing the sum modulo 10. 
 *	
-*	For example, the CAS number of water is 7732-18-5: the checksum 5 is calculated as (8×1 + 1×2 + 2×3 + 3×4 + 7×5 + 7×6) = 105; 105 mod 10 = 5.
+*	For example, the CAS number of water is 7732-18-5: the checksum 5 is calculated as (8Ã—1 + 1Ã—2 + 2Ã—3 + 3Ã—4 + 7Ã—5 + 7Ã—6) = 105; 105 mod 10 = 5.
 *
 ***************************************/
 as
