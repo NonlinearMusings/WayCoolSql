@@ -51,4 +51,4 @@ return	with cte12Rows(rowNumber) as
 			) as cdp  -- CAS digit position
 			where	cdp.digit is not null
 		) as cas;
-```
+``` 
