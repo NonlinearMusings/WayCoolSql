@@ -1,24 +1,22 @@
+## Validating a Chemical Abstracts Service (CAS) Registry number?
+
+Quoting from https://en.wikipedia.org/wiki/CAS_Registry_Number
+
+CASRN is separated by hyphens into three parts, the first consisting from two up to seven digits, the second consisting of two digits, 
+the third consisting of a single digit serving as a check digit.
+
+The check digit is found by taking the last digit times 1, the preceding digit times 2, the preceding digit times 3 etc., 
+adding all these up and computing the sum modulo 10. 
+
+For example, the CAS number of water is 7732-18-5
+    * the checksum 5 is calculated as (8×1 + 1×2 + 2×3 + 3×4 + 7×5 + 7×6) = 105
+    * and 105 mod 10 = 5.
+
+Using set-based logic, we can call this inlineable TVF like this: ```sql select isValid from dbo.tvf_IsCasNumber('7732-18-5'); ```
+
 ``` sql
 create function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
 returns table
-/**************************************
-*	Use set-based logic to validate a Chemical Abstracts Service (CAS) Number
-*
-*	Quoting from https://en.wikipedia.org/wiki/CAS_Registry_Number
-*
-*	A CASRN is separated by hyphens into three parts, the first consisting from two up to seven digits, the second consisting of two digits, 
-*	and the third consisting of a single digit serving as a check digit.
-*
-*	The check digit is found by taking the last digit times 1, the preceding digit times 2, the preceding digit times 3 etc., 
-*	adding all these up and computing the sum modulo 10. 
-*	
-*	For example, the CAS number of water is 7732-18-5: the checksum 5 is calculated as (8×1 + 1×2 + 2×3 + 3×4 + 7×5 + 7×6) = 105; 105 mod 10 = 5.
-*
-*
-*	USAGE:  select isValid from dbo.tvf_IsCasNumber('7732-18-5');
-*
-*
-***************************************/
 as
 return	with cte12Rows(rowNumber) as
         (
