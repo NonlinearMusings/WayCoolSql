@@ -13,7 +13,8 @@ Quoting from https://en.wikipedia.org/wiki/CAS_Registry_Number
 >    * and 105 mod 10 = 5.
 > 
 
-Using set-based logic, we can call this inlineable TVF like this: ```sql select isValid from dbo.tvf_IsCasNumber('7732-18-5'); ```
+Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsCasNumber(@casNumber); ```
+which returns an integer ```isValid``` of 1 for a valid CAS number; otherwise it returns 0.
 
 ``` sql
 create function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
@@ -30,9 +31,9 @@ return	with cte12Rows(rowNumber) as
                 ) as twelve(ones)
         )
         select  isValid	= cast(	case
-                                when right(@casNumber, 1) like '[^0-9]' then 0									-- invalid checkdigit
+                                when right(@casNumber, 1) like '[^0-9]' then 0                                  -- invalid checkdigit
                                 when (sum(cas.positionalValue) % 10) = cast(right(@casNumber, 1) as int) then 1	-- valid checksum
-                                else 0																			-- invalid checksum
+                                else 0                                                                          -- invalid checksum
                                 end
                             as int)
         from
@@ -52,6 +53,6 @@ return	with cte12Rows(rowNumber) as
                     where   r.rowNumber between 3 and 12 - (12 - len(@casNumber)) -- exclude the right most checkdigit and its preceeding dash from processing
                 ) as i	-- iterator
             ) as cdp  -- CAS digit position
-            where	cdp.digit is not null
+            where cdp.digit is not null
         ) as cas;
 ``` 
