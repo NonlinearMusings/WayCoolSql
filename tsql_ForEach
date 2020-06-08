@@ -1,0 +1,9 @@
+## ForEach loops in T-SQL
+
+Did you know T-SQL supports ForEach? No? Well, don't feel bad because it's called OUTER APPLY!
+
+Loops are incredibly useful, unless you're trying to write fast T-SQL code. (Can you say [RBAR?])https://www.red-gate.com/simple-talk/sql/t-sql-programming/rbar-row-by-agonizing-row/))
+Too frequently SQL Developers fall into the traditional, non-set-based mindset of iterating over tables using T-SQL's
+WHILE statement. Now, I haven't seen everything, but I have seen a lot, and I've yet to see a WHILE loop that cannot be
+refactored out of the algorithm unless a stored procedure is being called within the loop. There may be other cases,
+but I've yet to encounter them.
