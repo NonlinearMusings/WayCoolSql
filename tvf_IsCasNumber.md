@@ -13,14 +13,14 @@ Quoting from https://en.wikipedia.org/wiki/CAS_Registry_Number
 >    * and 105 mod 10 = 5.
 > 
 
-Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsCasNumber(@casNumber); ```
+Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsCasNumber(@casNumber) ```
 which returns an integer ```isValid``` of 1 for a valid CAS number; otherwise it returns 0.
 
 ``` sql
 create function dbo.tvf_IsCasNumber( @casNumber varchar(12) )
 returns table
 as
-return	with cte12Rows(rowNumber) as
+return	with cte12Rows as
         (
             select  rowNumber = row_number() over (order by (select 1))
             from 
