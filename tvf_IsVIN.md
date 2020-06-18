@@ -1,3 +1,9 @@
+## Validating a Vehicle Identification Number (VIN)?
+
+Following the guidance from https://vin.dataonesoftware.com/vin_basics_blog/bid/112040/use-vin-validation-to-improve-inventory-quality for the decoding.
+
+Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsVIN(@vin)``` which returns an integer ```isValid``` of 1 for a valid VIN; otherwise it returns 0.
+
 ```sql
 create function dbo.tvf_IsVIN( @vin char(17) )
 returns table
