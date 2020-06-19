@@ -56,3 +56,20 @@ return	with cte12Rows as
             where cdp.digit is not null
         ) as cas;
 ``` 
+Example:
+
+```
+select  n.casNumber
+    ,   isValid = (select isValid from dbo.tvf_IsCasNumber(n.casNumber))
+from    dbo.checksumNumbers as n;
+```
+| casNumber | isValid |
+|-----------|---------|
+|2051-24-3|1
+|107-07-3|1
+|7732-18-5|1
+|NULL|0
+|7732-18-4|0
+|abcd|0
+
+Way Cool, huh?
