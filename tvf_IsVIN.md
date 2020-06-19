@@ -47,3 +47,20 @@ return  with cteVIN as
                     )   as xlt  -- transliteration
             ) as decoded;
 ```
+Example:
+
+```
+select  n.vinNumber
+    ,   isValid = (select isValid from dbo.tvf_IsVin(n.vinNumber))
+from    dbo.checksumNumbers as n;
+```
+| vinNumber | isValid |
+|-----------|---------|
+|1FTRX12V69FA11242|1
+|5GZCZ43D13S812715|1
+|JF2SJADC1FZ819871|0
+|12345678901234567|0
+|NULL|0
+abcd|0
+
+Way cool, huh?
