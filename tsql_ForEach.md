@@ -47,8 +47,6 @@ outer apply
 Take note of how the data table's rows are being iterated over as if a ForEach were being used
 and how the OUTER APPLY operators are applying the i and j data sets as nested loops!
 
-Way Cool, huh?
-
 | iteration | data.name | data.id | outer.i | inner.j |exp1   | exp2   |
 |-----------|-----------|---------|---------|---------|-------|--------|
 | 1         | one	    | 1       | 10      | 100     |110100 | 1000   |
@@ -69,3 +67,5 @@ Way Cool, huh?
 16|three|3|20|100|320100|6000
 17|three|3|20|200|320200|12000
 18|three|3|20|300|320300|18000
+
+Way Cool, huh?
