@@ -1,9 +1,16 @@
+## Validating a LUHN number?
+
+Implementing the algorithm from https://en.wikipedia.org/wiki/Luhn_algorithm
+
+Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsLuhnNumber(@luhnNumber) ```
+which returns an integer ```isValid``` of 1 for a valid LUHN number; otherwise it returns 0.
+
 ``` sql
-create function dbo.tvf_IsLuhn( @luhn varchar(16) )
+create function dbo.tvf_IsLuhnNumber( @luhnNumber varchar(16) )
 returns table
 as
 return  select  isValid =   cast(   case
-                                    when (10 - (sum(luhn.positionalValue)  % 10)) = try_cast(right(@luhn, 1) as int) then 1
+                                    when (10 - (sum(luhn.positionalValue)  % 10)) = try_cast(right(@luhnNumber, 1) as int) then 1
                                     else 0
                                     end
                                 as int)
@@ -19,8 +26,8 @@ return  select  isValid =   cast(   case
             from
             (   -- null out non-numerics
                 select  numeral = cast( case 
-                                        when substring(@luhn, i.[position], 1) like '[0-9]' 
-                                        then substring(@luhn, i.[position], 1) 
+                                        when substring(@luhnNumber, i.[position], 1) like '[0-9]' 
+                                        then substring(@luhnNumber, i.[position], 1) 
                                         else null 
                                         end 
                                     as tinyint)
@@ -35,8 +42,24 @@ return  select  isValid =   cast(   case
                                 ,   (1),(1),(1),(1)
                         ) as sixteen(ones)
                 ) as i
-                where   i.[position] between 1 and (len(@luhn) -1)  -- exclude the right most digit, which is the checkdigit
+                where   i.[position] between 1 and (len(@luhnNumber) -1)  -- exclude the right most digit, which is the checkdigit
             ) as sp  -- string position
             where   sp.numeral is not null
         ) as luhn;
 ```
+Example:
+
+```
+select  n.luhnNumber
+    ,   isValid = (select isValid from dbo.tvf_IsLuhnNumber(n.luhnNumber))
+from    dbo.checksumNumbers as n;
+```
+| luhnNumber | isValid |
+|-----------|---------|
+|79927398713|1
+|79927398714|0
+|NULL|0
+|m1x3dup|0
+|5531006517734651|1
+
+Way Cool, huh?
