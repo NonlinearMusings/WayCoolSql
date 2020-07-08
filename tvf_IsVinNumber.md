@@ -2,10 +2,10 @@
 
 Following the guidance from https://vin.dataonesoftware.com/vin_basics_blog/bid/112040/use-vin-validation-to-improve-inventory-quality for the decoding.
 
-Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsVIN(@vin)``` which returns an integer ```isValid``` of 1 for a valid VIN; otherwise it returns 0.
+Using set-based logic, we can call the inlineable TVF ```dbo.tvf_IsVinNumber(@vinNumber)``` which returns an integer ```isValid``` of 1 for a valid VIN; otherwise it returns 0.
 
 ```sql
-create function dbo.tvf_IsVIN( @vin char(17) )
+create function dbo.tvf_IsVinNumber( @vinNumber char(17) )
 returns table
 as
 return  with cteVIN as
@@ -19,19 +19,19 @@ return  with cteVIN as
                 ) as vin([position], [value])
         )     
         select  isValid =   cast(   case 
-                                    when decoded.checkSum % 11 = 10 and substring(@vin, 9, 1) = 'X' then 1      -- valid checksum (10 is the Roman Numeral X)
-                                    when decoded.checkSum % 11 = cast(substring(@vin, 9, 1) as smallint) then 1 -- valid checksum (remainder equals the checkdigit)
-                                    else 0                                                                      -- invalid checksum
+                                    when decoded.checkSum % 11 = 10 and substring(@vinNumber, 9, 1) = 'X' then 1        -- valid checksum (10 is the Roman Numeral X)
+                                    when decoded.checkSum % 11 = cast(substring(@vinNumber, 9, 1) as smallint) then 1   -- valid checksum (remainder equals the checkdigit)
+                                    else 0                                                                              -- invalid checksum
                                     end
                                 as int)
         from
             (
                 select  checkSum = sum( case 
-                                        when xlt.[value] is null then isnull(try_cast(substring(@vin, cteVIN.[position], 1) as smallint), 0)    -- self value, if digit
-                                        else cast(xlt.[value] as smallint)                                                                      -- transliterated value
+                                        when xlt.[value] is null then isnull(try_cast(substring(@vinNumber, cteVIN.[position], 1) as smallint), 0)  -- self value, if digit
+                                        else cast(xlt.[value] as smallint)                                                                          -- transliterated value
                                         end
                                         *
-                                        cteVIN.[value]                                                                                          -- position's value (weight)
+                                        cteVIN.[value]                                                                                              -- position's value (weight)
                                     )
                 from    cteVIN
                 outer   apply
@@ -43,7 +43,7 @@ return  with cteVIN as
                                     ,   ('J', 1),   ('K', 2),   ('L', 3),   ('M', 4),   ('N', 5),   /*  O  */   ('P', 7),   /*  Q  */   ('R', 9)
                                     ,   /* n/a */   ('S', 2),   ('T', 3),   ('U', 4),   ('V', 5),   ('W', 6),   ('X', 7),   ('Y', 8),   ('Z', 9)
                             )   as mapping(letter, [value])
-                        where   mapping.letter = substring(@vin, cteVIN.[position], 1)
+                        where   mapping.letter = substring(@vinNumber, cteVIN.[position], 1)
                     )   as xlt  -- transliteration
             ) as decoded;
 ```
@@ -51,7 +51,7 @@ Example:
 
 ```
 select  n.vinNumber
-    ,   isValid = (select isValid from dbo.tvf_IsVin(n.vinNumber))
+    ,   isValid = (select isValid from dbo.tvf_IsVinNumber(n.vinNumber))
 from    dbo.checksumNumbers as n;
 ```
 | vinNumber | isValid |
