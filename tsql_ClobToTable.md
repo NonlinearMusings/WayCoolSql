@@ -17,15 +17,23 @@ but will quickly demand your attention if you try this with a less than complian
   * CSV delimited
   * has a single header row
 * We want to assign row numbers so that they correspond with their line number in the source file (data lineage)
-* The source data doesn't contain quoted strings or other JSON special characters in the data
+* The source data doesn't contain JSON special characters other than possibly double quoted strings, per CSV standards
 * The source data doesn't contain nested commas (i.e. commas within strings)
 * The source data is clean enough to directly cast to a SQL Server data type without error handling
 
-Observations:
+OBSERVATIONS:
 * The statement's overall speed is signifcantly hampered by the CE's inablity to correctly estimate the number of rows being processed.
 * The speed of OPENJSON decreases with each column added.
 * On my laptop, it's consistently taking about 6-seconds to process a 13.6MB file, for a processing throughput of ~2MB/sec.
 * I'm processing an entire file with a single T-SQL statement!
+
+THOUGHTS:
+* Clearly 1GB per 8.5 minutes isn't that impressive, but think of this T-SQL as a technology demonstrator -- it shows what's possible!
+  The choke points are in STRING_SPLIT and OPENJSON. Not that they are in and of themselves necessarily slow, but rather that's where the work IS happening.
+  If you do a Show Plan you'll see that an underlying issue is the CE's inability to correctly forecast row counts. Thus, for larger files it may be prudent 
+  to split the statements up so that the file is ingested into an intermediate table as JSON and then a second statement that parses the JSON to a final SQL table
+  (or maybe even better: leverages SQL Server's Computed Columns capabilities to parse the JSON data to columns in the table that can be indexed and be done! 
+  See [Index JSON data](https://docs.microsoft.com/en-us/sql/relational-databases/json/index-json-data?view=sql-server-ver15) for details.)
 
 ``` sql
 select  r.rowNum
@@ -36,12 +44,12 @@ cross   apply
         select  rowNum	= row_number() over (order by (select (1))) +1				-- enum rows, accounting for filtered out header row
 		    ,   [value]	= cast(replace(rd.[value], char(13), '') as varchar(1024))	-- remove CRs and cast to varchar holding the entire row
         from    string_split(clob.BulkColumn, char(10)) as rd -- row data			-- split at LF
-        where   -- data rows only
+        where   -- data rows only (the files data rows begin with numeric values)
                 rd.value like '[0-9]%'
     ) as data
 cross   apply
     (
-        values ( '{"fields":["' + replace(data.value, ',', '","') + '"]}' )            -- convert CSV delimited row a JSON array
+        values ( '{"fields":["' + replace(replace(data.value, '"', '\"'), ',', '","') + '"]}' )	-- convert CSV delimited row a JSON array, preserving double quotes
     ) as json(array)
 cross   apply openjson(json.array,  'strict $')
     with 
