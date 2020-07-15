@@ -49,7 +49,11 @@ cross   apply
     ) as data
 cross   apply
     (
-        values ( '{"fields":["' + replace(replace(data.value, '"', '\"'), ',', '","') + '"]}' )	-- convert CSV delimited row a JSON array, preserving double quotes
+        values	( '{"fields":["' + replace(
+										replace(data.value, '"', '\"')	-- escape double quotes
+										, ',', '","')					-- JSON-ify columns
+								+ '"]}'
+				)	-- convert CSV delimited to JSON array
     ) as json(array)
 cross   apply openjson(json.array,  'strict $')
     with 
