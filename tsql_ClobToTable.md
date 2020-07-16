@@ -64,7 +64,28 @@ cross   apply openjson(json.array,  'strict $')
     ,   units       int         '$.fields[3]'
     ,   revenue     money       '$.fields[4]'
     ,   country     varchar(16) '$.fields[5]'
+    ,   comments    varchar(64) '$.fields[6]'
     ) as tc;    -- typed columns
 ```
+
+H/T to [David Browne](https://www.linkedin.com/in/david-browne-737806/) for suggesting using OPENJSON as opposed to my original solution individually
+extracting the fields with JSON_VALUE. The change resulted in a 33% boost in query performance.
+
+**INPUT** *SALES001.CSV*  
+ProductID,Date,Zip,Units,Revenue,Country,Comment  
+726,1/15/1999,75056 CEDEX 01,1,115.45,France,Just the good ol' boys  
+1909,1/15/1999,75056 CEDEX 01,2,398.90,France,never meanin' no harm  
+1961,2/15/1999,75056 CEDEX 01,1,97.07,France,"beats all you never saw"  
+1517,2/15/1999,75056 CEDEX 01,1,141.65,France,"been in ""trouble"" with the law"  
+606,2/15/1999,75056 CEDEX 01,1,314.74,France, since the day they was born  
+
+**OUTPUT** *(note that garbage data in Zip has been truncated due to varchar(5) being used)*
+|ProductID |   Date    |  Zip  | Units | Revenue | Country | Comment                 |
+|----------|-----------|-------|-------|---------|---------|-------------------------|
+|726       | 1/15/1999 | 75056 | 1     | 115.45  | France  | Just the good ol' boys
+1909|1/15/1999|75056|2|398.90|France|never meanin' no harm
+1961|2/15/1999|75056|1|97.07|France|"beats all you never saw"
+1517|2/15/1999|75056|1|141.65|France|"been in ""trouble"" with the law"
+606|2/15/1999|75056|1|314.74|France|since the day they was born
 
 Way Cool, huh?
