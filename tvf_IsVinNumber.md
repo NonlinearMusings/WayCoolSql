@@ -38,7 +38,7 @@ return  with cteVIN as
                     (
                         select  mapping.[value]
                         from    
-                            (   -- each letter has an assinged value, noting that I, O and Q are not used
+                            (   -- each letter has an assigned value, noting that I, O and Q are not used
                                 values  ('A', 1),   ('B', 2),   ('C', 3),   ('D', 4),   ('E', 5),   ('F', 6),   ('G', 7),   ('H', 8)    /*  I  */
                                     ,   ('J', 1),   ('K', 2),   ('L', 3),   ('M', 4),   ('N', 5),   /*  O  */   ('P', 7),   /*  Q  */   ('R', 9)
                                     ,   /* n/a */   ('S', 2),   ('T', 3),   ('U', 4),   ('V', 5),   ('W', 6),   ('X', 7),   ('Y', 8),   ('Z', 9)
