@@ -2,7 +2,8 @@
 
 NOTES:
 - This code isn't strictly required for SQL Server as its native T-SQL based XML processing capabilities can do Base64 transformations. 
-However, Azure Synapse Analytics' Dedicated SQL Pools currently does not have that capability -- but it can now!
+However, Azure Synapse Analytics' Dedicated SQL Pools currently does not have XML capability, but using this function you can have a fast T-SQL
+solution for decoding Base64 strings.
 - Azure Synapse Analytics' currently does not support table-value constructors. Therefore, to use this code in Synapse the VALUES statements
 will need to be replaced with SELECT/UNION ALL constructs. Otherwise, the code works AS-IS.
 
