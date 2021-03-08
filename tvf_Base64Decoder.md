@@ -1,5 +1,11 @@
 ## Need to decode a Base64 string?
 
+NOTES:
+- This code isn't strictly required for SQL Server as its native T-SQL based XML processing capabilities can do Base64 transformations. 
+However, Azure Synapse Analytics' Dedicated SQL Pools currently does not have that capability -- but it can now!
+- Azure Synapse Analytics' currently does not support table-value constructors. Therefore, to use this code in Synapse the VALUES statements
+will need to be replaced with SELECT/UNION ALL constructs. Otherwise, the code works AS-IS.
+
 Inspired from the work at: 
 * https://base64.guru/learn/base64-algorithm/decode
 * https://www.sqlservercentral.com/scripts/base64-encode-and-decode-in-t-sql
@@ -8,6 +14,35 @@ Inspired from the work at:
 
 Using set-based logic, we can call the inlineable TVF ```dbo.tvf_Base64Decoder(@encodedPayload) ```
 which returns the decoded, ASCII string.
+
+The blockers are that Base64 is a 6-bit encoding scheme living in an 8-bit world and SQL Server does not have native bit
+shift operators nor is it fond of working with arbitrarily sized data types that are not whole byte multiples. 
+
+Challenge Accepted!
+
+As explained in the Base64 link above, 'QUJD' at the bit level is 00010000|00010100|00001001|00000011 and needs to transformed
+into 01000001|01000010|01000011, which is 'ABC'.
+
+Before we go any further:
+* Base64 strings are comprised of sextets. Four byte character groupings each containing three ASCII characters.
+* The leading two bits, positions 1-2 (left to right) are discardable prefixes. Their purpose is to let 6-bit values reside in an 8-bit representation.
+
+To get the first character we need bits 3-8 from the 1st byte and bits 3-4 from the 2nd byte.
+- Discard the first two bits from byte #1 using left shift 2 (multiply by 4) to get: 01000000.
+- Get only bits 3 and 4 from byte #2 using shift right 4 (dividing by 16) to get...: 00000001.
+- Bitwise OR the two intermediate results together to get 01000001 (65) or ASCII 'A'.
+
+To get the second character we need bits 5-8 from the 2nd byte and bits 3-6 from the 3rd byte.
+- Shift left 4 (multiple by 16) on byte #2 to get: 01000000.
+- Shift right 2 (divide by 4) on byte #3 to get..: 00000010.
+- Bitwise OR the two intermediate results together to get 01000010 (66) or ASCII 'B'.
+
+To get the third character we need bits 7-8 from the 3rd byte and bits 3-8 from the 4th byte.
+- Shift left 6 (multiply by 64) on byte #3 to get: 01000000.
+- Shift right 2 (divide by 1) on byte #4 to get..: 00000011.
+- Bitwise OR the two intermediate results together to get 01000011 (67) or ASCII 'C'.
+
+Lastly, use ```STRING_AGG()``` to concatenate the decoded sextets together to reveal the full ASCII string!
 
 ``` sql
 create function dbo.tvf_Base64Decoder( @encodedPayload varchar(8000) )
