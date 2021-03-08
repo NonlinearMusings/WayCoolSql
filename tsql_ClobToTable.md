@@ -10,7 +10,9 @@ The following is a four step process for ingesting CSV data files into SQL Serve
    
 To ingest the file simply amend the code to become either an INSERT/SELECT or add an INTO clause.
 
-NOTE: The code operates on a few assumptions, not that they cannot be overcome, just that they are not accounted for in the code itself,
+NOTE:
+
+The code operates on a few assumptions, not that they cannot be overcome, just that they are not accounted for in the code itself,
 but will quickly demand your attention if you try this with a less than compliant file: 
 * The input file, SALES001.CSV, is
   * a character file
