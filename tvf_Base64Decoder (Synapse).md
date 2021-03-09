@@ -1,4 +1,4 @@
-## Need to decode a Base64 string? (Azure Synapse Analytics version)
+## Need to decode a Base64 string? (Azure Synapse Analytics)
 
 The difference between the Synapse Analytics and SQL Server versions of this function is the use of SELECT/UNION ALL versus VALUES
 to build data sets.
