@@ -38,7 +38,7 @@ THOUGHTS:
   See [Index JSON data](https://docs.microsoft.com/en-us/sql/relational-databases/json/index-json-data?view=sql-server-ver15) for details.)
 
 ``` sql
-select  r.rowNum
+select  rd.rowNum
     ,   tc.*
 from    openrowset( bulk '/tmp/sales001.csv', single_clob ) as clob
 cross   apply
