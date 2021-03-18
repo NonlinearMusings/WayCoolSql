@@ -19,7 +19,7 @@ return  select  isValid =   cast(   case
             select  positionalValue =   cast(   case
                                                 when sp.numeral = 0 then sp.numeral
                                                 when (row_number() over (order by (select 1))) % 2 = 0 
-                                                then floor(log10((sp.numeral * 2))) + (sp.numeral * 2)
+                                                then floor(log10((sp.numeral * 2))) + (sp.numeral * 2) % 10
                                                 else sp.numeral
                                                 end
                                             as tinyint)
