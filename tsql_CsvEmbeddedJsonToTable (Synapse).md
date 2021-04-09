@@ -98,5 +98,27 @@ cross apply openjson([combined].[string], 'strict $')
     ,   [user_id]       varchar(50)     '$.fields[7]'
     )   as result;
 ```
+**INPUT**
+```text
+id,track_id,device_id,email,type,time_created,value,user_id
+308,28,"ab9105a",,3,2021-01-31 00:00:00.0000000,"{\"activity\": \"Channel\", \"position\": 137, \"time_spent\": 497}",418
+306,34,"ab9105a",,1,2021-01-31 00:00:00.0000000,,418
+307,6,"d9f175e",,1,2021-01-31 00:00:00.0000000,,518
+309,2,"6ce0bcb",,1,2021-01-31 00:00:00.0000000,,394
+310,2,"d9f175e",,3,2021-01-31 00:00:00.0000000,"{\"activity\": \"Channel\", \"position\": 122, \"time_spent\": 387}",518
+311,4,"6ce0bcb",,3,2021-01-31 00:00:00.0000000,"{\"activity\": \"Channel\", \"position\": 205, \"time_spent\": 190}",394
+312,8,"03b847f",,1,2021-01-31 00:00:01.0000000,,824
+```
+
+**OUTPUT**
+|id |track_id|device_id|email   |type|time_created|value                                              |user_id|
+|---|--------|---------|--------|----|------------|---------------------------------------------------|-------|
+|308|28      | ab9105a | \<null\> | 3  |      0     |{activity: Channel, position: 137, time_spent: 497}|418
+|306|34|ab9105a|\<null\>|1|0|\<null\>|418
+|307|6|d9f175e|\<null\>|1|0|\<null\>|518
+|309|2|6ce0bcb|\<null\>|1|0|\<null\>|394
+|310|2|d9f175e|\<null\>|3|0|{activity: Channel, position: 122, time_spent: 387}|518
+|311|4|6ce0bcb|\<null\>|3|0|{activity: Channel, position: 205, time_spent: 190}|394
+|312|8|03b847f|\<null\>|1|0|\<null\>|824
 
 Way Cool, huh?
