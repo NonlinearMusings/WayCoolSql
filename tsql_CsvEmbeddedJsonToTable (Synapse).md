@@ -1,6 +1,6 @@
 # Reading CSV files with embedded JSON with T-SQL
 
-Need to read/import CSV data with embedded JSON using Synapse Serverless? Well, then you came to the right place!
+Need to read/import CSV data with embedded JSON using Synapse SQL Serverless? Well, then you came to the right place!
 
 The reason this code exists is because both CSV and JSON use commas as delimiters and understandably Synapse’s 
 CSV parser cannot distinguish between the two when reading the file. Therefore, the trick is to hide the embedded 
