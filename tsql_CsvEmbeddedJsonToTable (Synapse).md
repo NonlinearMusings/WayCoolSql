@@ -68,7 +68,7 @@ cross apply
 cross apply
     (   -- remove the embedded JSON string
         select [string] = cast( case
-                                when len(embeddedjson.[string] = 0 then [raw].clob
+                                when len(embeddedjson.[string]) = 0 then [raw].clob
                                 else replace([raw].clob, embeddedjson.[string], '^^^') 
                                 end
                                 as varchar(4000))
