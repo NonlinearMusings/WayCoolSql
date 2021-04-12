@@ -39,12 +39,12 @@ The interesting item of note is the query duration. The processing impact from h
 
 Being a Technologist it’s tempting to poo-poo the 40% 'processing penalty' until you consider the alternatives of:
 * Cannot process the file(s) at all due to the embedded JSON
-* The time required to have the CSV files recreated using a field delimiter other than a comma
+* The time required to have the CSV files recreated using a field delimiter other than a comma (but what's the fun of that?)
 
 ```sql
 select  result.*
 from    openrowset( -- parse file as rows of Character Large OBjects
-                    bulk 'https://<container>.dfs.core.windows.net/synapse/csv/<fileName.csv>'
+                    bulk 'https://<container>.dfs.core.windows.net/<fileName.csv>'
                 ,   format          = 'CSV'
                 ,   parser_version  = '2.0'
                 ,   fieldterminator = '0x01'    -- unlikely field termination character
@@ -59,33 +59,34 @@ from    openrowset( -- parse file as rows of Character Large OBjects
         )   as  [raw]
 cross apply
     (   -- get the embedded JSON string
-        select embeddedJSON = cast( case
-                                    when charindex('"{', [raw].clob) = 0 
-                                    then ''
-                                    else substring([raw].clob, charindex('"{', [raw].clob), charindex('}"', [raw].clob) - charindex('"{', [raw].clob) +2)
-                                    end
-                                    as varchar(4000))
-    ) as    [get]
-cross apply
-    (   -- remove the embedded json string
-        select [string] = cast(replace([raw].clob, [get].embeddedJSON, '^^^') 
+        select [string] = cast( case
+                                when charindex('{', [raw].clob) = 0 then ''
+                                else substring([raw].clob, charindex('{', [raw].clob), charindex('}', [raw].clob) - charindex('{', [raw].clob) +1)
+                                end
                                 as varchar(4000))
-    ) as    [jsonless]
+    ) as    embeddedjson
 cross apply
-    (   -- convert the json-less string to JSON
-        select [string] = cast('{"fields":["' + REPLACE(REPLACE([jsonless].[string], '"', '\"'), ',', '","') + '"]}'
+    (   -- remove the embedded JSON string
+        select [string] = cast( case
+                                when len(embeddedjson.[string] = 0 then [raw].clob
+                                else replace([raw].clob, embeddedjson.[string], '^^^') 
+                                end
                                 as varchar(4000))
-    ) as    [jsonified]
+    ) as    jsonless
 cross apply
-    (   -- re-embed the json string while removing its outer double-quote delimiters to ensure a combined, well-formed JSON string
-        select [string] = cast(replace(jsonified.[string], '"^^^"', case
-                                                                    when len([get].embeddedJSON) = 0 
-                                                                    then ''
-                                                                    else substring([get].embeddedJSON, 2, len([get].embeddedJSON) -2) 
-                                                                    end)
+    (   -- convert the JSON-less string to JSON
+        select [string] = cast('{"fields":["' + replace(replace(jsonless.[string], '"', '\"'), ',', '","') + '"]}'
                                 as varchar(4000))
-    ) as    [combined]
-cross apply openjson([combined].[string], 'strict $')
+    ) as    jsonified
+cross apply
+    (   -- re-embed the JSON string while removing its outer double-quote delimiters to ensure a combined, well-formed JSON string
+        select [string] = cast( case
+                                when len(embeddedjson.[string]) = 0 then jsonified.[string]
+                                else replace(jsonified.[string], '"\^^^\""', embeddedjson.[string]) 
+                                end
+                                as varchar(4000))
+    ) as    combined
+cross apply openjson(combined.[string], 'strict $')
     with
     (   -- cast JSON string into a strongly-typed SQL table
         [id]            bigint          '$.fields[0]'
