@@ -43,7 +43,7 @@ To get the third character we need bits 7-8 from the 3rd byte and bits 3-8 from 
 - Shift right 2 (divide by 1) on byte #4 to get..: 00000011.
 - Bitwise OR the two intermediate results together to get 01000011 (67) or ASCII 'C'.
 
-Lastly, use ```STRING_AGG()``` to concatenate the decoded sextets together to reveal the full ASCII string!
+Lastly, use ```STRING_AGG()``` to concatenate the decoded sextets together to reveal the fully decoded ASCII string!
 
 ``` sql
 create function dbo.tvf_Base64Decoder( @encodedPayload varchar(8000) )
