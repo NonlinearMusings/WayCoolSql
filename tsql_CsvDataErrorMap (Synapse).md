@@ -8,8 +8,8 @@ This technique allows a CSV file to be ingested via an Azure Synapse Analytics's
 
 There are three steps to the processing:
 1. Read in the file's raw data in as character columns
-2. Cast each raw column to its strongly typed target
-3. Create a data error mapping of the failed casts
+2. Convert (or transform) each raw column to its strongly typed target
+3. Create a data error mapping of failed conversions
 
 NOTES:
 
@@ -21,15 +21,16 @@ NOTES:
   * (e)rrors alias for the data error bit map
 * Using the prefixes allows us to easily discern the before and after state of each column in a single projection
   * i.e. rawUnits and cvtUnit can be rendered side-by-side for quick, visual inspection
-* The column [bitMap] is a T-SQL BigInt which enables us to track up to 63 columns (0 - 62 inclusive)
-  * We cannot map 64 columns to a BigInt as 2^63 (0 - 63 inclusive) is an overflow condition
-  * If more than 63 columns per row need to be mapped/tracked then a segmentation strategy should be adopted whereby columns 1 thru 62 are mapped to [bitMap1], column 63 to 126 to [bitMap2], etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
+* The column [bitMap] is an 8-byte, T-SQL, BigInt which enables us to track up to 63 columns (0 - 62 inclusive)
+  * We cannot use all 64 bits as 2^63 is an overflow condition - so stopping at 2^62 keeps things simple
+  * If more than 63 columns per row need to be mapped then a segmentation strategy can be adopted whereby columns 1 thru 62 are mapped to [bitMap1], columns 63 to 126 to [bitMap2], etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
 * The 'secret' of the [bitMap] field is that every power of 2 is a unique number and by assiging raw columns ordinal values of my choosing I can individually track them 
   * I am deliberately mapping every column to a bit value eventhough this could be considered redundant for character columns
+  * I am deliberately using zero-based counting to get 63 columns per BigInt. If you choose to use ones-based counting then you'll get 62 columns per BigInt
   * I am deliberately maintaining column ordering throughout the CROSS APPLYs to help faciliate the ability to verify the code's implementation correctness
 * The (c)onvert CROSS APPLY, in this example, is responsible solely for converting column data. However, all manner of business logic could be added here to support more complex transformations. The caveat being that any failure must ultimately return a NULL value
 * The (e)rrors CROSS APPLY generates the error bit map for the row based on the NULLs resulting from (c)onvert
-* The code layout, while potentially verbose, is acutally very methodical and repeatable when traced by column. (Try following the [zip] column for example.)
+* The code layout, while potentially verbose, is acutally very concise, methodical and repeatable when traced by column. (Try following the [zip] column for example.)
 
 ```sql
 select  r.rowNum
