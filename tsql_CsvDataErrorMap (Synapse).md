@@ -22,8 +22,8 @@ NOTES:
 * Using the prefixes allows us to easily discern the before and after state of each column in a single projection
   * i.e. rawUnits and cvtUnit can be rendered side-by-side for quick, visual inspection
 * The column [bitMap] is an 8-byte, T-SQL, BigInt which enables us to track up to 63 columns (0 - 62 inclusive)
-  * We cannot use all 64 bits as 2^63 is an overflow condition - so stopping at 2^62 keeps things simple
-  * If more than 63 columns per row need to be mapped then a segmentation strategy can be adopted whereby columns 1 thru 62 are mapped to [bitMap1], columns 63 to 126 to [bitMap2], etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
+  * We cannot use all 64 bits as 2^64 is an overflow condition - so stopping at 2^63 keeps things simple
+  * If more than 63 columns per row need to be mapped then a segmentation strategy can be adopted whereby columns 1 thru 63 are mapped to [bitMap1], columns 64 to 127 to [bitMap2], etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
 * The 'secret' of the [bitMap] field is that every power of 2 is a unique number and by assiging raw columns ordinal values of my choosing I can individually track them 
   * I am deliberately mapping every column to a bit value eventhough this could be considered redundant for character columns
   * I am deliberately using zero-based counting to get 63 columns per BigInt. If you choose to use ones-based counting then you'll get 62 columns per BigInt
