@@ -21,9 +21,9 @@ NOTES:
   * (e)rrors alias for the data error bit map
 * Using the prefixes allows us to easily discern the before and after state of each column in a single projection
   * i.e. rawUnits and cvtUnit can be rendered side-by-side for quick, visual inspection
-* The column [bitMap] is a T-SQL BigInt allowing us to track up to 63 columns
-  * We cannot map 64 columns to a BigInt as 2^64 is an overflow condition
-  * If more than 63 columns per row need to be mapped/tracked then a segmentation strategy should be adopted whereby columns 1 thru 63 are mapped to bitMap1, column 64 to 127 to bitMap2, etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
+* The column [bitMap] is a T-SQL BigInt which enables us to track up to 63 columns (0 - 62 inclusive)
+  * We cannot map 64 columns to a BigInt as 2^63 (0 - 63 inclusive) is an overflow condition
+  * If more than 63 columns per row need to be mapped/tracked then a segmentation strategy should be adopted whereby columns 1 thru 62 are mapped to [bitMap1], column 63 to 126 to [bitMap2], etc. as this maintains a [SARGalbe](https://blogs.msmvps.com/robfarley/2010/01/21/sargable-functions-in-sql-server) solution
 * The 'secret' of the [bitMap] field is that every power of 2 is a unique number and by assiging raw columns ordinal values of my choosing I can individually track them 
   * I am deliberately mapping every column to a bit value eventhough this could be considered redundant for character columns
   * I am deliberately maintaining column ordering throughout the CROSS APPLYs to help faciliate the ability to verify the code's implementation correctness
