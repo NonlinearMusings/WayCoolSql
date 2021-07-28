@@ -92,3 +92,67 @@ cross   apply
 6|40|606|2/15/1999|75056|a|314.74|(null)|606|2/15/1999|75056|(null)|314.74|(null)
 7|8|1518|2/15/1999|75056|a|141.65|France|1518|2/15/1999|75056|(null)|141.65|France
 8|0|786|5/31/2002|75001|10|68.2|France|786|5/31/2002|75001|10|68.2|France
+
+THE PAYOFF
+
+If the query is a CETAS writing to ```lz.ImportedCSV``` we can query ```dataErrorMap``` to measure data quality and programmatically control next steps. In short, you now have column level control over your data processing.
+
+For example:
+```sql
+-- process all rows with no column level errors
+select  *
+from    lz.ImportedCSV
+where   dataErrorMap = 0;
+
+-- process all records with good Date and Zip columns
+select  *
+from    lz.ImportedCSV
+where   dataErrorMap & 2 = 2    -- Date
+  and   dataErrorMap & 4 = 4;   -- Zip
+
+-- get a high-level good/bad row count
+select  BadRecords  = sum(case when dataErrorMap > 0 then 1 else 0 end)
+    ,   GoodRecords = sum(case when dataErrorMap > 0 then 0 else 1 end)
+    ,   TotalRecords= count(1)
+from    lz.ImportedCSV;
+
+-- get error counts by column
+select  BadProduct = sum( case when dataErrorMap & 1 = 1 then 1 else 0 end)
+    ,   BadDate    = sum( case when dataErrorMap & 2 = 2 then 1 else 0 end)
+    ,   BadZip     = sum( case when dataErrorMap & 4 = 4 then 1 else 0 end)
+    ,   BadUnits   = sum( case when dataErrorMap & 8 = 8 then 1 else 0 end)
+    ,   BadRevenue = sum( case when dataErrorMap & 16 = 16 then 1 else 0 end)
+    ,   BadCountry = sum( case when dataErrorMap & 32 = 32 then 1 else 0 end)
+from    lz.ImportedCSV;
+```
+So, all of this is pretty cool, but we can take it up another level and make it way cool!
+
+Let's start by adding code to the (c)onvert CROSS APPLY to make it NULL aware. (You can actually add as much business/validation logic here as you like. It's your call!)
+```sql
+cross   apply
+    (
+        select  cvtProductId    = try_cast(r.ProductId as varchar(16))
+            ,   cvtDate         = try_cast(r.[Date] as date)
+            ,   DateIsNull      = case when r.[Date] is null then 1 else 0 end
+            ,   cvtZip          = try_cast(r.Zip as varchar(6))
+            ,   ZipIsNull       = case when r.Zip is null then 1 else 0 end
+            ,   cvtUnits        = try_cast(r.Units as int)
+            ,   UnitsNull       = case when r.Units is null then 1 else 0 end
+            ,   cvtRevenue      = try_cast(r.Revenue as money)
+            ,   RevenueIsNull   = case when r.Revenue is null then 1 else 0 end
+            ,   cvtCountry      = try_cast(r.Country as varchar(16))
+            ,   CountryIsNull   = case when r.Country is null then 1 else 0 end
+    )   as c    -- convert
+```
+We now have the ability to distingush between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where 'natural' NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that
+```sql
+        -- Country IS NULL is not an error condition
+        case
+        when c.CountryIsNull = 1 then 0
+        when c.cvtCountry is null then power(cast(2 as bigint), 5) 
+        else 0 
+        end -- 32
+```
+In summary, we have created a set-based data processing pipeline with the ability to track data errors by row and column!
+
+Way Cool, huh?
