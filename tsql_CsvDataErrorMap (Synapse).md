@@ -13,7 +13,7 @@ There are three steps to the processing:
 
 NOTES:
 
-* Assuming a CSV file that can be processed with OPENROWSET() if all the columns are ingested as character
+* Assuming a CSV file that can be processed with OPENROWSET() when all columns are ingested as character
 * Follow Jovan Popovic's guidance to [Always use UTF-8 collations to read UTF-8 text in serverless SQL pool](https://techcommunity.microsoft.com/t5/azure-synapse-analytics/always-use-utf-8-collations-to-read-utf-8-text-in-serverless-sql/ba-p/1883633) and read the data in to columns large enough to hold the expected values using the WITH clause of OPENROWSET()
 * Using the following aliases and projections to track the data along its journey
   * the (r)aw alias along with the 'raw' prefix for column names
@@ -34,6 +34,7 @@ NOTES:
 
 ```sql
 select  r.rowNum
+    ,   dataErrorMap    = e.bitMap
     ,   rawProductId    = r.ProductId
     ,   rawDate         = r.[Date]
     ,   rawZip          = r.Zip
@@ -41,7 +42,6 @@ select  r.rowNum
     ,   rawRevenue      = r.Revenue
     ,   rawCountry      = r.Country
     ,   c.*
-    ,   dataErrorMap    = e.bitMap
 from    openrowset( bulk            'https://storageinator.dfs.core.windows.net/root/raw/csv/dataErrorMap-Data-Small.csv'
                 ,   format          = 'CSV'
                 ,   firstrow        = 2
@@ -61,7 +61,7 @@ cross   apply
     (
         select  cvtProductId    = try_cast(r.ProductId as varchar(16))
             ,   cvtDate         = try_cast(r.[Date] as date)
-            ,   cvtZip          = case when r.Zip like '%z' then cast(null as varchar(5)) else try_cast(r.Zip as varchar(5)) end
+            ,   cvtZip          = try_cast(r.Zip as varchar(6))
             ,   cvtUnits        = try_cast(r.Units as int)
             ,   cvtRevenue      = try_cast(r.Revenue as money)
             ,   cvtCountry      = try_cast(r.Country as varchar(16))
@@ -81,3 +81,14 @@ cross   apply
                             case when c.cvtCountry      is null then power(cast(2 as bigint), 5) else 0 end -- 32
     ) as e;     -- errors
 ```
+ **OUTPUT**
+ |rowNum | dataErrorMap | rawProductId | rawDate | rawZip | rawUnits | rawRevenue | rawCountry | cvtProductId | cvtDate  | cvtZip  | cvtUnits | cvtRevenue | cvtCountry |
+|-------|--------------|--------------|---------|--------|----------|------------|------------|--------------|----------|---------|----------|------------|------------|
+|1      |62            |1             |(null)   |(null)  |(null)    |(null)      |(null)      |1             |(null)    |(null)   |(null)    |(null)      |(null)
+2|10|726|(null)|75056|a|115.45|France|726|(null)|75056|(null)|115.45|France
+3|12|1909|1/15/1999|(null)|a|398.9|France|1909|1/15/1999|(null)|(null)|398.9|France
+4|8|1961|2/15/1999|75056|(null)|97.07|France|1961|2/15/1999|75056|(null)|97.07|France
+5|24|1517|2/15/1999|75056|a|(null)|France|1517|2/15/1999|75056|(null)|(null)|France
+6|40|606|2/15/1999|75056|a|314.74|(null)|606|2/15/1999|75056|(null)|314.74|(null)
+7|8|1518|2/15/1999|75056|a|141.65|France|1518|2/15/1999|75056|(null)|141.65|France
+8|0|786|5/31/2002|75001|10|68.2|France|786|5/31/2002|75001|10|68.2|France
