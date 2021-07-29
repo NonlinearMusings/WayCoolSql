@@ -107,8 +107,8 @@ where   dataErrorMap = 0;
 -- process all records with good Date and Zip columns
 select  *
 from    lz.ImportedCSV
-where   dataErrorMap & 2 = 2    -- Date
-  and   dataErrorMap & 4 = 4;   -- Zip
+where   dataErrorMap & 2 = 0    -- Date
+  and   dataErrorMap & 4 = 0;   -- Zip
 
 -- get a high-level good/bad row count
 select  BadRecords  = sum(case when dataErrorMap > 0 then 1 else 0 end)
