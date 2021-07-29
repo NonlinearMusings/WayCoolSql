@@ -146,12 +146,25 @@ cross   apply
 ```
 We now have the ability to distingush between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where 'natural' NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that
 ```sql
-        -- Country IS NULL is not an error condition
-        case
-        when c.CountryIsNull = 1 then 0
-        when c.cvtCountry is null then power(cast(2 as bigint), 5) 
-        else 0 
-        end -- 32
+cross   apply
+    (
+        select  bitMap  =   case when c.cvtProductId    is null then power(cast(2 as bigint), 0) else 0 end -- 1
+                            +
+                            case when c.cvtDate         is null then power(cast(2 as bigint), 1) else 0 end -- 2
+                            +
+                            case when c.cvtZip          is null then power(cast(2 as bigint), 2) else 0 end -- 4
+                            +
+                            case when c.cvtUnits        is null then power(cast(2 as bigint), 3) else 0 end -- 8
+                            +
+                            case when c.cvtRevenue      is null then power(cast(2 as bigint), 4) else 0 end -- 16
+                            +
+                            case
+                            when c.CountryIsNull = 1 then 0 -- Country IS NULL is not an error condition
+                            when c.cvtCountry is null then power(cast(2 as bigint), 5) 
+                            else 0 
+                            end -- 32
+
+    ) as e;     -- errors
 ```
 In summary, we have created a set-based data processing pipeline with the ability to track data errors by row and column!
 
