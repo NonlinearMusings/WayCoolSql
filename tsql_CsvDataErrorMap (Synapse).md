@@ -81,6 +81,10 @@ cross   apply
                             case when c.cvtCountry      is null then power(cast(2 as bigint), 5) else 0 end -- 32
     ) as e;     -- errors
 ```
+**INPUT**
+
+![dataErrorMap-Data-Small.csv](Data/dataErrorMap-Data-Small.csv)
+
  **OUTPUT**
  |rowNum | dataErrorMap | rawProductId | rawDate | rawZip | rawUnits | rawRevenue | rawCountry | cvtProductId | cvtDate  | cvtZip  | cvtUnits | cvtRevenue | cvtCountry |
 |-------|--------------|--------------|---------|--------|----------|------------|------------|--------------|----------|---------|----------|------------|------------|
@@ -127,7 +131,7 @@ from    lz.ImportedCSV;
 ```
 So, all of this is pretty cool, but we can take it up another level and make it way cool!
 
-Let's start by adding code to the (c)onvert CROSS APPLY to make it NULL aware. (You can actually add as much business/validation logic here as you like. It's your call!)
+Let's start by adding code to the (c)onvert CROSS APPLY to make it NULL aware:
 ```sql
 cross   apply
     (
@@ -144,7 +148,7 @@ cross   apply
             ,   CountryIsNull   = case when r.Country is null then 1 else 0 end
     )   as c    -- convert
 ```
-We now have the ability to distingush between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where 'natural' NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that
+We now have the ability to distingush between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where arriving NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that:
 ```sql
 cross   apply
     (
