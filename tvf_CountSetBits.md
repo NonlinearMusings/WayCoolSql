@@ -4,7 +4,7 @@ This function was developed as a companion to the Data Error Map processing cove
 
 NOTES:
 * BigInts are 8-bytes (64-bits) in size and can be inspected as a Binary(8) variable
-* Using the lessons from [tsql_ForEach](tsql_ForEach.md) we can iterate over all 64 bits a byte at a time with SUBSTRING() and a bit at a time using Bitwise AND(&) to see which bits are set
+* Using the lessons from [tsql_ForEach](tsql_ForEach.md) we can iterate over all 64 bits a byte at a time with SUBSTRING() and a bit at a time using Bitwise AND (&) to see which bits are set
 * Each set bit is counted as 1 and their SUM() is the count of bits set -- which in the context of Data Error Map gives us the number of bad columns per row
 
 ```sql
