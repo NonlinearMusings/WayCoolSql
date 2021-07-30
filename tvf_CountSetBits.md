@@ -1,6 +1,6 @@
 ## Counting the number of bits set in a BigInt?
 
-This function was developed as a companion to the Data Error Map processing covered in [tsql_CsvDataErrorMap%20(Synapse)](tsql_CsvDataErrorMap%20(Synapse).md), but it is also a technology demonstrator for bit counting.
+This function was developed as a companion to the Data Error Map processing covered in [tsql_CsvDataErrorMap (Synapse)](tsql_CsvDataErrorMap%20(Synapse).md), but it is also a technology demonstrator for bit counting.
 
 NOTES:
 * BigInts are 8-bytes (64-bits) in size and can be inspected as a Binary(8) variable
