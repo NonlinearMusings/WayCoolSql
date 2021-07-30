@@ -35,6 +35,6 @@ return  select  [count] =   sum(    case
             ) as [bit];
 ```
 
-The ineffeciency of this algorithim is that all 64 bits are inspected as opposed to Brian Kernighan's wickedly effecient C language algorithm. Buy hey! This is still bit-level, set-based processing using T-SQL!
+The ineffeciency of this algorithim is that all 64 bits are inspected as opposed to Brian Kernighan's wickedly effecient C language algorithm. But hey! This is still bit-level, set-based processing using T-SQL!
 
 Way Cool, huh?
