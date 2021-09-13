@@ -2,7 +2,7 @@
 
 The difference between the Synapse Analytics and SQL Server version is that FOR JSON PATH isn't supported in a distributed query. Thus, it is not possible to return the entire
 result set as JSON. This necessitates logically splitting the query in two. The 'base' of the pivot table is a standard GROUP BY and the JSON magic still occurs inside
-of JSON_QUERY(), but the extraction of the pivoted columns is pushed into a CROSS APPLY empolying a WITH clause - where the columns are specified.  
+of JSON_QUERY(), but the extraction of the pivoted columns is pushed into a CROSS APPLY employing a WITH clause - where the columns are specified.  
 
 NOTE: Documentation for this function may be found in the SQL Server version.  
 
