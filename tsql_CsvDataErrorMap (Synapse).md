@@ -32,7 +32,7 @@ NOTES:
 * The (e)rrors CROSS APPLY generates the error bit map for the row based on the NULLs resulting from (c)onvert
 * The code layout, while potentially verbose, is acutally very concise, methodical and repeatable when traced by column. (Try following the [zip] column for example.)
 
-```sql
+```sql  
 select  r.rowNum
     ,   dataErrorMap    = e.bitMap
     ,   rawProductId    = r.ProductId
@@ -42,7 +42,7 @@ select  r.rowNum
     ,   rawRevenue      = r.Revenue
     ,   rawCountry      = r.Country
     ,   c.*
-from    openrowset( bulk            'https://storageinator.dfs.core.windows.net/root/raw/csv/dataErrorMap-Data-Small.csv'
+from    openrowset( bulk            'https://<storageAccount>.dfs.core.windows.net/root/raw/csv/dataErrorMap-Data-Small.csv'
                 ,   format          = 'CSV'
                 ,   firstrow        = 2
                 ,   parser_version  = '2.0'
