@@ -5,7 +5,7 @@ to build data sets.
 
 NOTE: Documentation for this function may be found in the SQL Server version.
 
-```sql
+```sql  
 create function dbo.tvf_Base64Decoder ( @encodedPayload varchar(8000) )
 returns table
 as
