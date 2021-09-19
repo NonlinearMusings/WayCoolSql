@@ -41,7 +41,7 @@ Being a Technologist it’s tempting to poo-poo the 40% 'processing penalty' unt
 * Cannot process the file(s) at all due to the embedded JSON
 * The time required to have the CSV files recreated using a field delimiter other than a comma (but what's the fun of that?)
 
-```sql
+```sql  
 select  result.*
 from    openrowset( -- parse file as rows of Character Large OBjects
                     bulk 'https://<container>.dfs.core.windows.net/<fileName.csv>'
@@ -49,12 +49,12 @@ from    openrowset( -- parse file as rows of Character Large OBjects
                 ,   parser_version  = '2.0'
                 ,   fieldterminator = '0x01'    -- unlikely field termination character
                 ,   fieldquote      = '0x02'    -- unlikely field quote character
-                ,   escapechar      = '\'
+                ,   escapechar      = '0x5C'
                 ,   firstrow        = 2         -- skip header
                 ,   rowterminator   = '0x0A'    -- line feed
                 )
-        with    
-        (   
+        with
+        (
             clob varchar(4000) collate Latin1_General_100_BIN2_UTF8
         )   as  [raw]
 cross apply
@@ -69,7 +69,7 @@ cross apply
     (   -- remove the embedded JSON string
         select [string] = cast( case
                                 when len(embeddedjson.[string]) = 0 then [raw].clob
-                                else replace([raw].clob, embeddedjson.[string], '^^^') 
+                                else replace([raw].clob, embeddedjson.[string], '^^^')
                                 end
                                 as varchar(4000))
     ) as    jsonless
@@ -82,7 +82,7 @@ cross apply
     (   -- re-embed the JSON string while removing its outer double-quote delimiters to ensure a combined, well-formed JSON string
         select [string] = cast( case
                                 when len(embeddedjson.[string]) = 0 then jsonified.[string]
-                                else replace(jsonified.[string], '"\^^^\""', embeddedjson.[string]) 
+                                else replace(jsonified.[string], '"\^^^\""', embeddedjson.[string])
                                 end
                                 as varchar(4000))
     ) as    combined
@@ -90,7 +90,7 @@ cross apply openjson(combined.[string], 'strict $')
     with
     (   -- cast JSON string into a strongly-typed SQL table
         [id]            bigint          '$.fields[0]'
-    ,   track_id        bigint          '$.fields[1]'          
+    ,   track_id        bigint          '$.fields[1]'
     ,   device_id       varchar(20)     '$.fields[2]'
     ,   email           varchar(50)     '$.fields[3]'
     ,   [type]          smallint        '$.fields[4]'
