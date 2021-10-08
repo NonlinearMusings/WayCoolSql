@@ -47,7 +47,7 @@ cross   apply
             ,   [value] = cast(replace(rd.[value], char(13), '') as varchar(1024))  -- remove CRs and cast to varchar holding the entire row
         from    string_split(clob.BulkColumn, char(10)) as rd -- row data           -- split at LF
         where   -- data rows only (the files data rows begin with numeric values)
-                rd.value like '[0-9]%'
+                rd.[value] like '[0-9]%'
     ) as data
 cross   apply
     (
