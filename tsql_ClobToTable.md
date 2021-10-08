@@ -52,8 +52,8 @@ cross   apply
 cross   apply
     (
         values  ( '{"fields":["' + replace(
-                                        replace(data.value, '"', '\"')  -- escape double quotes
-                                    , ',', '","')                       -- JSON-ify columns
+                                        replace(data.[value], '"', '\"')    -- escape double quotes
+                                    , ',', '","')                           -- JSON-ify columns
                                  + '"]}'
                 )   -- convert CSV delimited to JSON array
     ) as json(array)
