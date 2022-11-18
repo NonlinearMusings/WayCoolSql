@@ -148,7 +148,7 @@ cross   apply
             ,   CountryIsNull   = case when r.Country is null then 1 else 0 end
     )   as c    -- convert
 ```
-We now have the ability to distingush between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where arriving NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that:
+We now have the ability to distinguish between columns that arrived as NULLs versus columns that failed conversion and were cast to NULL. So, if we have columns where arriving NULL values should not be considered an error condition we can modify the (e)rrors CROSS APPLY to account for that:
 ```sql
 cross   apply
     (
