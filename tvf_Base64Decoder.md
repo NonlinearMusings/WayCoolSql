@@ -34,7 +34,7 @@ To get the first character we need bits 3-8 from the 1st byte and bits 3-4 from 
 - Bitwise OR the two intermediate results together to get 01000001 (65) or ASCII 'A'.
 
 To get the second character we need bits 5-8 from the 2nd byte and bits 3-6 from the 3rd byte.
-- Shift left 4 (multiple by 16) on byte #2 to get: 01000000.
+- Shift left 4 (multiply by 16) on byte #2 to get: 01000000.
 - Shift right 2 (divide by 4) on byte #3 to get..: 00000010.
 - Bitwise OR the two intermediate results together to get 01000010 (66) or ASCII 'B'.
 
