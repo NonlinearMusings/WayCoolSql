@@ -67,7 +67,7 @@ return  with cte8Rows as
         ,   cteSextet as
         (   -- a Base64 encoded string is comprised of 4-byte sextets, create an iterator of starting offsets for each sextet
             select  top ((len(@encodedPayload) / 4)) 
-                    setextOffset = ((row_number() over (order by (select 1))) * 4) -3
+                    sextetOffset = ((row_number() over (order by (select 1))) * 4) -3
             from    cte64Rows      as sixtyfour1 
             cross   join cte64Rows as sixtyfour2
         )
@@ -85,17 +85,17 @@ return  with cte8Rows as
         )
         ,   cteDecode as
         (   -- the fun stuff! (see explaination above)
-            select  chars   =	concat(	char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset   , 1) collate Latin1_General_CS_AS) *  4) as binary(1)) as tinyint) 
+            select  chars   =	concat(	char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset   , 1) collate Latin1_General_CS_AS) *  4) as binary(1)) as tinyint) 
                                                 | 
-                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset +1, 1) collate Latin1_General_CS_AS) / 16) as binary(1)) as tinyint)
+                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset +1, 1) collate Latin1_General_CS_AS) / 16) as binary(1)) as tinyint)
                                             )
-                                      , char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset +1, 1) collate Latin1_General_CS_AS) * 16) as binary(1)) as tinyint) 
+                                      , char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset +1, 1) collate Latin1_General_CS_AS) * 16) as binary(1)) as tinyint) 
                                                 | 
-                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset +2, 1) collate Latin1_General_CS_AS) /  4) as binary(1)) as tinyint)
+                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset +2, 1) collate Latin1_General_CS_AS) /  4) as binary(1)) as tinyint)
                                             )
-                                      , char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset +2, 1) collate Latin1_General_CS_AS) * 64) as binary(1)) as tinyint) 
+                                      , char(   cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset +2, 1) collate Latin1_General_CS_AS) * 64) as binary(1)) as tinyint) 
                                                 | 
-                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.setextOffset +3, 1) collate Latin1_General_CS_AS) /  1) as binary(1)) as tinyint)
+                                                cast(cast(((select m.[value] from cteMapping as m where m.[char] = substring(@encodedPayload, s.sextetOffset +3, 1) collate Latin1_General_CS_AS) /  1) as binary(1)) as tinyint)
                                             )
                                       )
             from    cteSextet as s
