@@ -8,23 +8,23 @@ The other day I was thinking about SQL hashing again (doesn't everyone?) and tho
 Firstly
 * The core of this code is from AlwaysLearing's reply at [CRC-16 SQL CCTI](https://stackoverflow.com/questions/75839677/crc-16-sql-ccti)
 * My adaptation relies on T-SQL's quirky update behavior, which is called out as an [antipattern](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/select-local-variable-transact-sql?view=sql-server-ver16#c-antipattern-use-of-recursive-variable-assignment) in Microsoft's SELECT @local_variable documentation.
-* My implementation fails the [Inlineable scalar UDF requirements](https://learn.microsoft.com/en-us/sql/relational-databases/user-defined-functions/scalar-udf-inlining?view=sql-server-ver16#requirements) thereby making it slower than it should be.
+* My implementation fails the [Inlineable scalar UDF requirements](https://learn.microsoft.com/en-us/sql/relational-databases/user-defined-functions/scalar-udf-inlining?view=sql-server-ver16#requirements) thereby making it slower than it otherwise would be.
 
 However
 * After researching quirky updates a bit more I am reasonably convinced that the 'antipattern' designation should only apply when ORDER BY is used.
+* Microsoft will not support this 'antipattern'.
+* It **is** some pretty cool code...
+* It works on my machine! :zany_face:
+
+Read more about CRC at [On-line CRC calculation and free library](https://www.lammertbies.nl/comm/info/crc-calculation) and compare the outputs at [crccalc.com](https://crccalc.com/)
 
 ```sql
 create function dbo.svf_CRC16_CCITT( @input varchar(1024) )
 	returns int
 as
 begin
-	-- https://techcommunity.microsoft.com/t5/sql-server-blog/writing-new-hash-functions-for-sql-server/ba-p/305123
-	-- https://www.lammertbies.nl/comm/info/crc-calculation
-
-	-- https://stackoverflow.com/questions/75839677/crc-16-sql-ccti
-
 	-- CRC-16/AUG-CCITT using polynomial 0x1021 and initialization vector 0x1D0F
-	-- Compare results against: https://crccalc.com/
+	-- Compare results against: 
 
 	declare @crc	int			= 0x1D0F	-- initialization vector 
 		,	@lookup	binary(512) =			-- 256 * 2-byte lookup values = 512 bytes
@@ -55,3 +55,4 @@ begin
 	return @crc;
 end;
 ```
+Way cool, huh?
