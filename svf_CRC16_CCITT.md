@@ -13,7 +13,7 @@ Firstly
 However
 * After researching quirky updates a bit more I am reasonably convinced that the 'antipattern' designation should only apply when ORDER BY is used.
 * Microsoft will not support this 'antipattern'.
-* It **is** some pretty cool code...
+* It **is** some pretty cool T-SQL...
 * It works on my machine! :zany_face:
 
 Read more about CRC at [On-line CRC calculation and free library](https://www.lammertbies.nl/comm/info/crc-calculation) and compare the outputs at [crccalc.com](https://crccalc.com/)
@@ -26,8 +26,8 @@ begin
 	-- CRC-16/AUG-CCITT using polynomial 0x1021 and initialization vector 0x1D0F
 	-- Compare results against: 
 
-	declare @crc	int			= 0x1D0F	-- initialization vector 
-		,	@lookup	binary(512) =			-- 256 * 2-byte lookup values = 512 bytes
+    declare     @crc    int            = 0x1D0F -- initialization vector 
+        ,    @lookup	binary(512)    =        -- 256 * 2-byte lookup values = 512 bytes
 				0x0000102120423063408450A560C670E781089129A14AB16BC18CD1ADE1CEF1EF +
 				0x123102103273225252B5429472F762D693398318B37BA35AD3BDC39CF3FFE3DE +
 				0x246234430420140164E674C744A45485A56AB54B85289509E5EEF5CFC5ACD58D +
@@ -47,12 +47,12 @@ begin
 
 	select	@crc = ((@crc << 8) ^ cast(substring(@lookup, ((@crc >> 8) ^ [ascii].code) * 2 + 1, 2) as int)) & 0xFFFF
 	from
-		( 
-			select	code = ascii(substring(@input, gs.[value], 1))
-			from	generate_series(1, len(@input)) as gs
-		) as [ascii];
-
+        ( 
+            select  code = ascii(substring(@input, gs.[value], 1))
+            from    generate_series(1, len(@input)) as gs
+        ) as [ascii];
+        
 	return @crc;
 end;
 ```
-Way cool, huh?
+Way Cool, huh?
