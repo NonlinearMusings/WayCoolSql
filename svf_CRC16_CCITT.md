@@ -46,12 +46,12 @@ begin
 				0xEF1FFF3ECF5DDF7CAF9BBFBA8FD99FF86E177E364E555E742E933EB20ED11EF0;
 
 	-- null in, null out
-	if @input is null 
-		return cast(null as int);
+    if @input is null
+        return cast(null as int);
 
 	-- empty string in, initialization vector out
-	if len(@input) = 0
-		return @crc;
+    if len(@input) = 0
+        return @crc;
 
 	-- string in, hash out
 	select	@crc = ((@crc << 8) ^ cast(substring(@lookup, ((@crc >> 8) ^ [ascii].code) * 2 + 1, 2) as int)) & 0xFFFF
@@ -83,7 +83,7 @@ from
 
 OUTPUT
 |Actual|Expected|Input|
-|------|--------|-----|
+|------|--------|:----|
 0x1D0F|0x1D0F|	
 0x9479|0x9479|A
 0xE5CC|0xE5CC|123456789
