@@ -1,4 +1,4 @@
-Need a way to quickly insert rows into a table while minimizing pagelatch-ex contention? This function reverses (or mirrors) a 64-bit bigint thereby distributing inserts across the table, no table partitioning required!
+Need a way to quickly insert rows into a table while minimizing pagelatch-ex contention? This function reverses (or mirrors) a 64-bit bigint thereby distributing inserts around the table, no table partitioning required!
 
 H/T to Rick and his [Bit reversion](https://dangerousdba.blogspot.com/2011/10/bit-reversion.html) blog entry for the idea and explaination. I've simply T-SQL-ized it. (Yes, I just made that word up.)
 
@@ -6,9 +6,9 @@ The challenge, as with the CRC16_CCITT algorithm, is that T-SQL doesn't have a w
 After several failed attempts to be clever I realized that simple is better and broke the problem down into reversing each byte in a BigInt and reassembling them in reverse order.
 This algorithm can probably be tweaked a bit more, but I'm tired of fussing with it at the moment and am opting for this implementation's clarity.
 
-Also, [Resolve last-page insert PAGELATCH_EX contention in SQL Server](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/resolve-pagelatch-ex-contention) list several other approaches to this problem, with #4
-[Add a non-sequential value as a leading key](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/resolve-pagelatch-ex-contention#method-4-add-a-non-sequential-value-as-a-leading-key)
-being exactly what this routine is doing, but while **using** sequential values! 
+Also, [Resolve last-page insert PAGELATCH_EX contention in SQL Server](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/resolve-pagelatch-ex-contention) list several other approaches to this problem.
+Method #4's [Add a non-sequential value as a leading key](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/resolve-pagelatch-ex-contention#method-4-add-a-non-sequential-value-as-a-leading-key)
+approach is similar to this routine, except we **are** using sequential values! 
 
 ```sql
 create function dbo.tvf_Reverse64( @number bigint )
@@ -47,5 +47,28 @@ return	select	[value]	=    cast(  -- individually reverse each byte and reassemb
                     )	as b(n)	-- binary number
             )	as byte;	-- byte per column
 ```
+INPUT
+```sql
+select   [Sequence]  = gs.[value]
+    ,    Reversed    = r.[value]
+from     generate_series(1, 10) as gs
+cross    apply dbo.tvf_Reverse64(gs.[value]) as r;
+```
+
+OUTPUT
+|Input|Reversed|
+|-----|--------|
+1|2305843009213693952
+2|1152921504606846976
+3|3458764513820540928
+4|-9223372036854775808
+5|-6917529027641081856
+6|-8070450532247928832
+7|-5764607523034234880
+8|4611686018427387904
+9|6917529027641081856
+10|5764607523034234880
+
+As you can see, simple sequential inputs when reversed result in well distributed values that alleviate pagelatch-ex contention.
 
 Way Cool, huh?
