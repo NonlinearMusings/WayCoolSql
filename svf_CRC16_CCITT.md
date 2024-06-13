@@ -14,7 +14,7 @@ However
 * After researching quirky updates a bit more I am reasonably convinced that the 'antipattern' designation should only apply when ORDER BY is used.
 * Microsoft will not support this 'antipattern'.
 * It **is** some pretty cool T-SQL...
-* It works on my machine! :zany_face:
+* ...and it works on my machine! :zany_face:
 
 Read more about CRC at [On-line CRC calculation and free library](https://www.lammertbies.nl/comm/info/crc-calculation) and compare the outputs at [crccalc.com](https://crccalc.com/)
 
@@ -45,6 +45,15 @@ begin
 				0xFD2EED0FDD6CCD4DBDAAAD8B9DE88DC97C266C075C644C453CA22C831CE00CC1 +
 				0xEF1FFF3ECF5DDF7CAF9BBFBA8FD99FF86E177E364E555E742E933EB20ED11EF0;
 
+	-- null in, null out
+	if @input is null 
+		return cast(null as int);
+
+	-- empty string in, initialization vector out
+	if len(@input) = 0
+		return @crc;
+
+	-- string in, hash out
 	select	@crc = ((@crc << 8) ^ cast(substring(@lookup, ((@crc >> 8) ^ [ascii].code) * 2 + 1, 2) as int)) & 0xFFFF
 	from
         ( 
@@ -55,4 +64,29 @@ begin
 	return @crc;
 end;
 ```
+
+SAMPLE
+```sql
+select   test.Actual
+    ,    Expected    = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
+    ,    test.Input
+from
+    (
+        values   (0x1D0F, '')
+            ,    (0x9479, 'A')
+            ,    (0xE5CC, '123456789')
+            ,    (0x9E86, '!"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~')
+            ,    (0xE938, replicate('A', 256))
+            ,    (null, null)
+    ) as test([Actual], [Input]);
+```
+|Actual|Expected|Input|
+|------|--------|-----|
+0x1D0F|0x1D0F|	
+0x9479|0x9479|A
+0xE5CC|0xE5CC|123456789
+0x9E86|0x9E86|!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~
+0xE938|0xE938|AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+NULL|NULL|NULL
+
 Way Cool, huh?
