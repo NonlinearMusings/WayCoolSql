@@ -16,7 +16,7 @@ However
 * It **is** some pretty cool T-SQL...
 * ...and it works on my machine! :zany_face:
 
-Read more about CRC at [On-line CRC calculation and free library](https://www.lammertbies.nl/comm/info/crc-calculation) and compare the outputs at [crccalc.com](https://crccalc.com/)
+If you're interested, you can read more about CRC at [On-line CRC calculation and free library](https://www.lammertbies.nl/comm/info/crc-calculation) and compare the outputs at [crccalc.com](https://crccalc.com/)
 
 ```sql
 create function dbo.svf_CRC16_CCITT( @input varchar(1024) )
