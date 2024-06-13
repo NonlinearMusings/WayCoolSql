@@ -65,7 +65,7 @@ begin
 end;
 ```
 
-SAMPLE
+INPUT
 ```sql
 select   test.Actual
     ,    Expected    = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
@@ -80,6 +80,8 @@ from
             ,    (null, null)
     ) as test([Actual], [Input]);
 ```
+
+OUTPUT
 |Actual|Expected|Input|
 |------|--------|-----|
 0x1D0F|0x1D0F|	
@@ -88,5 +90,7 @@ from
 0x9E86|0x9E86|!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~
 0xE938|0xE938|AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 NULL|NULL|NULL
+
+Honestly, this really should be implemented as a [CLR Scalar-Valued Function](https://learn.microsoft.com/en-us/sql/relational-databases/clr-integration-database-objects-user-defined-functions/clr-scalar-valued-functions?view=sql-server-ver16), but otherwise...
 
 Way Cool, huh?
