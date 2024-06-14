@@ -1,3 +1,5 @@
+# Reversing a BigInt
+
 Need a way to quickly insert rows into a table while minimizing pagelatch-ex contention? This function reverses (or mirrors) a 64-bit bigint thereby distributing inserts around the table, no table partitioning required!
 
 H/T to Rick and his [Bit reversion](https://dangerousdba.blogspot.com/2011/10/bit-reversion.html) blog entry for the idea and explaination. I've simply T-SQL-ized it. (Yes, I just made that word up.)
