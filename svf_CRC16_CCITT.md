@@ -45,11 +45,11 @@ begin
 				0xFD2EED0FDD6CCD4DBDAAAD8B9DE88DC97C266C075C644C453CA22C831CE00CC1 +
 				0xEF1FFF3ECF5DDF7CAF9BBFBA8FD99FF86E177E364E555E742E933EB20ED11EF0;
 
-	-- null in, null out
+    -- null in, null out
     if @input is null
         return cast(null as int);
 
-	-- empty string in, initialization vector out
+    -- empty string in, initialization vector out
     if len(@input) = 0
         return @crc;
 
