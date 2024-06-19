@@ -6,7 +6,7 @@ Back in the days of SQL Server 2008-R2 I came across this fantastic article by T
 The other day I was thinking about SQL hashing again (doesn't everyone?) and thought that a set-based implementation of CRC16 would make a good add to Way Cool Sql... and here we are!
 
 Firstly
-* The core of this code is from AlwaysLearing's reply at [CRC-16 SQL CCTI](https://stackoverflow.com/questions/75839677/crc-16-sql-ccti)
+* The core of this code is from AlwaysLearning's reply at [CRC-16 SQL CCTI](https://stackoverflow.com/questions/75839677/crc-16-sql-ccti)
 * My adaptation relies on T-SQL's quirky update behavior, which is called out as an [antipattern](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/select-local-variable-transact-sql?view=sql-server-ver16#c-antipattern-use-of-recursive-variable-assignment) in Microsoft's SELECT @local_variable documentation.
 * My implementation fails the [Inlineable scalar UDF requirements](https://learn.microsoft.com/en-us/sql/relational-databases/user-defined-functions/scalar-udf-inlining?view=sql-server-ver16#requirements) thereby making it slower than it otherwise would be.
 
