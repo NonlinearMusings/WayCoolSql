@@ -58,7 +58,7 @@ cross    apply dbo.tvf_Reverse64(gs.[value]) as r;
 ```
 
 OUTPUT
-|Input|Reversed|
+|Sequence|Reversed|
 |-----|--------|
 1|2305843009213693952
 2|1152921504606846976
