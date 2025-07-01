@@ -47,19 +47,20 @@ from    openjson(
 ```  
 
 INPUT: ```dbo.IotData```   
-SourceTimestamp,NodeId,ApplicationUri,DisplayName,Value  
-2021-07-30 21:45:53.0000000,nodeAddress=DipData,urn:OpcPlc:opcserver1,DipData,99.80267284  
-2021-07-30 21:45:53.0000000,nodeAddress=SpikeData,urn:OpcPlc:opcserver1,SpikeData,99.80267284  
-2021-07-30 21:45:52.0000000,nodeAddress=DipData,urn:OpcPlc:opcserver3,DipData,-84.43279255  
-2021-07-30 21:45:52.0000000,nodeAddress=SpikeData,urn:OpcPlc:opcserver3,SpikeData,-84.43279255  
-2021-07-30 21:45:52.0000000,nodeAddress=SpikeData,urn:OpcPlc:opcserver2,SpikeData,6.43249E-14  
-2021-07-30 21:45:52.0000000,nodeAddress=DipData,urn:OpcPlc:opcserver2,DipData,6.43249E-14  
-2021-07-30 21:45:48.0000000,nodeAddress=DipData,urn:OpcPlc:opcserver1,DipData,99.80267284  
-2021-07-30 21:45:48.0000000,nodeAddress=SpikeData,urn:OpcPlc:opcserver1,SpikeData,99.80267284  
-2021-07-30 21:45:47.0000000,nodeAddress=RandomSignedInt32,urn:OpcPlc:opcserver1,RandomSignedInt32,1588001084  
-2021-07-30 21:45:47.0000000,nodeAddress=DipData,urn:OpcPlc:opcserver3,DipData,-90.48270525  
-2021-07-30 21:45:47.0000000,nodeAddress=SpikeData,urn:OpcPlc:opcserver3,SpikeData,-90.48270525  
-2021-07-30 21:45:47.0000000,nodeAddress=RandomSignedInt32,urn:OpcPlc:opcserver3,RandomSignedInt32,-1198295099  
+|SourceTimestamp|NodeId|ApplicationUri|DisplayName|Value|
+|---|---|---|---|---|
+2021-07-30 21:45:53.0000000|nodeAddress=DipData|urn:OpcPlc:opcserver1|DipData|99.80267284  
+2021-07-30 21:45:53.0000000|nodeAddress=SpikeData|urn:OpcPlc:opcserver1|SpikeData|99.80267284  
+2021-07-30 21:45:52.0000000|nodeAddress=DipData|urn:OpcPlc:opcserver3|DipData|-84.43279255  
+2021-07-30 21:45:52.0000000|nodeAddress=SpikeData|urn:OpcPlc:opcserver3|SpikeData|-84.43279255  
+2021-07-30 21:45:52.0000000|nodeAddress=SpikeData|urn:OpcPlc:opcserver2|SpikeData|6.43249E-14  
+2021-07-30 21:45:52.0000000|nodeAddress=DipData|urn:OpcPlc:opcserver2|DipData|6.43249E-14  
+2021-07-30 21:45:48.0000000|nodeAddress=DipData|urn:OpcPlc:opcserver1|DipData|99.80267284  
+2021-07-30 21:45:48.0000000|nodeAddress=SpikeData|urn:OpcPlc:opcserver1|SpikeData|99.80267284  
+2021-07-30 21:45:47.0000000|nodeAddress=RandomSignedInt32|urn:OpcPlc:opcserver1|RandomSignedInt32|1588001084  
+2021-07-30 21:45:47.0000000|nodeAddress=DipData|urn:OpcPlc:opcserver3|DipData|-90.48270525  
+2021-07-30 21:45:47.0000000|nodeAddress=SpikeData|urn:OpcPlc:opcserver3|SpikeData|-90.48270525  
+2021-07-30 21:45:47.0000000|nodeAddress=RandomSignedInt32|urn:OpcPlc:opcserver3|RandomSignedInt32|-1198295099
 
 OUTPUT:  
 |ApplicationUri|RelativeTimestamp|ReadingsFound|DipData|SpikeData|RandomSignedInt32|
