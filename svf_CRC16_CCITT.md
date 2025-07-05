@@ -67,7 +67,7 @@ end;
 
 INPUT
 ```sql
-select   Returned = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
+select   Actual = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
     ,    test.Expected
     ,    test.Input
 from
@@ -82,7 +82,7 @@ from
 ```
 
 OUTPUT
-|Returned|Expected|Input|
+|Actual|Expected|Input|
 |------|--------|:----|
 0x1D0F|0x1D0F|	
 0x9479|0x9479|A
