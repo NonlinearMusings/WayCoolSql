@@ -67,8 +67,8 @@ end;
 
 INPUT
 ```sql
-select   test.Actual
-    ,    Expected    = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
+select   Returned = cast(dbo.svf_CRC16_CCITT(test.Input) as binary(2))
+    ,    test.Expected
     ,    test.Input
 from
     (
@@ -78,11 +78,11 @@ from
             ,    (0x9E86, '!"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~')
             ,    (0xE938, replicate('A', 256))
             ,    (null, null)
-    ) as test([Actual], [Input]);
+    ) as test([Expected], [Input]);
 ```
 
 OUTPUT
-|Actual|Expected|Input|
+|Returned|Expected|Input|
 |------|--------|:----|
 0x1D0F|0x1D0F|	
 0x9479|0x9479|A
